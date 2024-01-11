@@ -1,4 +1,4 @@
-name: C/C++ CI
+name: Build roulette
 
 on:
   push:
@@ -15,14 +15,11 @@ jobs:
     - uses: actions/checkout@v3
     - name: make
       run: make build
-    - name: Upload to Release Action
-      uses: Shopify/upload-to-release@v2.0.0
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v4.0.0
       with:
-        name: Roulette build
-        # Path to the file to upload
+        name: Roulette
         path: ./roulette
-        # Content type for the file
-        content-type: application/octet-stream
-        # secrets.GITHUB_TOKEN
-        repo-token: secrets.TOKEN
-          
+        if-no-files-found: warn
+        retention-days: 0
+        compression-level: 0
