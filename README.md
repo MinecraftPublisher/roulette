@@ -1,4 +1,6 @@
 # roulette.c
+[![Build roulette](https://github.com/MinecraftPublisher/roulette/actions/workflows/build.yml/badge.svg)](https://github.com/MinecraftPublisher/roulette/actions/workflows/build.yml)
+
 Harmless and fun russian roulette written in C. AI is currently simply random. Useful for killing time.
 
 ## Usage
