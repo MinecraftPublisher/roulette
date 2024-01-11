@@ -1,0 +1,28 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: make
+      run: make build
+    - name: Upload to Release Action
+      uses: Shopify/upload-to-release@v2.0.0
+      with:
+        name: Roulette build
+        # Path to the file to upload
+        path: ./roulette
+        # Content type for the file
+        content-type: application/octet-stream
+        # secrets.GITHUB_TOKEN
+        repo-token: secrets.GITHUB_TOKEN
+          
