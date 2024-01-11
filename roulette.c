@@ -1,6 +1,5 @@
-#include "styles.h"
 #include "helpers.h"
-
+#include "styles.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -31,11 +30,52 @@ void END() {
     exit(0);
 }
 
+int chambersSinceLastRoll = 0;
+
 void AI() {
+    static bool  aiinit = false;
+    static int   aisize = 255;
+    static byte *aichoice;
+    static int   aiptr;
+
+    if (!aiinit) {
+        aichoice = malloc(sizeof(int) * aisize);
+        aiinit   = true;
+        aiptr    = 0;
+    }
+
+    if (aiptr == aisize - 1) {
+        aisize += 255;
+        aichoice = realloc(aichoice, sizeof(int) * aisize);
+    }
+
     msleep(2);
 
-    int AI_CHOICE = rand() % 100;
+    // TODO: Implement better AI choice algorithm
+    int CAN_CHEAT = rand() % 100 < 5;
+    int AI_CHOICE = revolver[ pointer ] ? 33 : 15;
+
+    if (!CAN_CHEAT) {
+        float probability = 1.0f / (float) (round_count - chambersSinceLastRoll);
+        if (probability > 0.5f) {
+            AI_CHOICE = 90; // shoot the user
+        } else if (probability <= 0.5f) {
+            int SHOULD_ROLL = rand() % 100;
+            if (SHOULD_ROLL < 33) { // roll the chamber
+                AI_CHOICE = 95;
+            } else if (SHOULD_ROLL < 66) { // shoot itself
+                AI_CHOICE = 30;
+            } else { // shoot the user
+                AI_CHOICE = 90;
+            }
+        }
+    }
+
+    aichoice[ aiptr ] = AI_CHOICE;
+    aiptr++;
+
     if (AI_CHOICE < 32) { // point at self
+        chambersSinceLastRoll++;
         print("Your enemy wants to shoot themselves.");
         printf(INDENT RED "Your enemy points the gun at their own head.");
         step;
@@ -56,6 +96,7 @@ void AI() {
             turn = aturn;
         }
     } else if (AI_CHOICE < 94) { // point at user
+        chambersSinceLastRoll++;
         print("Your enemy wants to shoot you.");
         printf(INDENT RED "Your enemy points the gun at you.");
         step;
@@ -76,6 +117,7 @@ void AI() {
             turn = uturn;
         }
     } else { // roll chamber
+        chambersSinceLastRoll = 0;
         print(MAG "Your enemy decided to roll the chamber.");
         pointer = point();
         msleep(1.5);
@@ -110,6 +152,7 @@ void USER() {
         case 0: print("There is (1) bullet in the chamber."); break;
 
         case '1':
+            chambersSinceLastRoll++;
             printf(INDENT RED "You put the gun on your head.");
             step;
 
@@ -131,6 +174,7 @@ void USER() {
 
             break;
         case '2':
+            chambersSinceLastRoll++;
             printf(INDENT RED "You point the gun at your enemy.");
             step;
 
@@ -153,6 +197,7 @@ void USER() {
             msleep(3);
             break;
         case '3':
+            chambersSinceLastRoll = 0;
             print(MAG "Rolling the chamber...");
             pointer = point();
             msleep(1.5);
@@ -191,14 +236,14 @@ void mode(char **argv) {
 }
 
 int main(int argc, char **argv) {
-    if (argc == 2) {
+    if (argc >= 2) {
         mode(argv);
         char *rounds = argv[ 1 ];
         round_count  = atoi(rounds);
         if (round_count < 3 || round_count > 24) {
             printf("Too many/low number of rounds. Rounds should be between 3 and 24.\n");
         }
-    } else if (argc == 3) {
+    } else if (argc == 1) {
         mode(argv);
         round_count = 6;
     } else {
@@ -220,13 +265,12 @@ int main(int argc, char **argv) {
     printf(INDENT "Filling the chamber... (");
     msleep(0.5);
     for (int i = 0; i < round_count; i++) {
-        if(i == 0) {
+        if (i == 0) {
             printf(RED "O");
             fflush(stdout);
             revolver[ i ] = true;
             msleep(0.35);
-        }
-        else {
+        } else {
             printf(GRN "O");
             fflush(stdout);
             revolver[ i ] = false;
