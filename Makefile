@@ -1,11 +1,18 @@
 clean:
-	rm -rf ./roulette
+	rm -rf ./build
+	mkdir ./build/
 
-build:
-	clang roulette.c -o roulette
+build: clean
+	clang roulette.c -o build/roulette
+
+build_g: clean
+	clang -g roulette.c -o build/roulette
 
 run: build
-	./roulette
+	./build/roulette
+
+debug: build_g
+	lldb ./build/roulette
 
 install: build
-	cp ./roulette /usr/local/bin/roulette
+	cp ./build/roulette /usr/local/bin/roulette

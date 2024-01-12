@@ -235,17 +235,20 @@ void mode(char **argv) {
     }
 }
 
+void COUNT_RC(char **argv) {
+    char *rounds = argv[ 1 ];
+    round_count  = atoi(rounds);
+    if (round_count < 3 || round_count > 24) {
+        printf("Too many/low number of rounds. Rounds should be between 3 and 24.\n");
+    }
+}
+
 int main(int argc, char **argv) {
-    if (argc >= 2) {
+    if (argc >= 3) {
         mode(argv);
-        char *rounds = argv[ 1 ];
-        round_count  = atoi(rounds);
-        if (round_count < 3 || round_count > 24) {
-            printf("Too many/low number of rounds. Rounds should be between 3 and 24.\n");
-        }
-    } else if (argc == 1) {
-        mode(argv);
-        round_count = 6;
+        COUNT_RC(argv);
+    } else if (argc == 2) {
+        COUNT_RC(argv);
     } else {
         round_count = 6;
     }
@@ -253,7 +256,7 @@ int main(int argc, char **argv) {
     srand(time(NULL));
 
     clear;
-    printf(RED);
+    printf(MAG);
     gun;
     printf(reset);
 
