@@ -57,13 +57,13 @@ void AI() {
 
     if (!CAN_CHEAT) {
         float probability = 1.0f / (float) (round_count - chambersSinceLastRoll);
-        if (probability > 0.5f) {
+        if (probability > 0.25f) {
             AI_CHOICE = 90; // shoot the user
-        } else if (probability <= 0.5f) {
+        } else {
             int SHOULD_ROLL = rand() % 100;
-            if (SHOULD_ROLL < 33) { // roll the chamber
+            if (SHOULD_ROLL < 10) { // roll the chamber
                 AI_CHOICE = 95;
-            } else if (SHOULD_ROLL < 66) { // shoot itself
+            } else if (SHOULD_ROLL < 40) { // shoot itself
                 AI_CHOICE = 30;
             } else { // shoot the user
                 AI_CHOICE = 90;
@@ -149,8 +149,6 @@ void USER() {
     gun;
     print("%s-- ROULETTE --%s", CYN, reset);
     switch (choice) {
-        case 0: print("There is (1) bullet in the chamber."); break;
-
         case '1':
             chambersSinceLastRoll++;
             printf(INDENT RED "You put the gun on your head.");
@@ -172,6 +170,7 @@ void USER() {
                 turn = uturn;
             }
 
+            msleep(3);
             break;
         case '2':
             chambersSinceLastRoll++;
@@ -208,6 +207,13 @@ void USER() {
 }
 
 void TURN() {
+    clear;
+    if(turn) printf(GRN);
+    else printf(RED);
+    gun;
+    print("%s-- ROULETTE --%s", CYN, reset);
+    print("There is (1) bullet in the chamber.");
+
     if (turn) USER();
     else
         AI();
@@ -289,13 +295,7 @@ int main(int argc, char **argv) {
 
     turn = random() % 2;
 
-    while (true) {
-        clear;
-        gun;
-        print("%s-- ROULETTE --%s", CYN, reset);
-
-        TURN();
-    }
+    while (true) TURN();
 
     return 0;
 }
