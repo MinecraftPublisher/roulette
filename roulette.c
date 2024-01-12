@@ -156,6 +156,7 @@ void USER() {
     clear;
     gun;
     print("%s-- ROULETTE --%s", CYN, reset);
+
     switch (choice) {
         case '1':
             chambersSinceLastRoll++;
@@ -197,7 +198,7 @@ void USER() {
             back;
             if (revolver[ pointer ]) {
                 printf(RED INDENT "BANG!");
-                printf(GRN " Your enemy died. You win.\n");
+                printf(GRN " Your enemy died. You win. \n");
                 END();
             } else {
                 print(RED "Your enemy has lived. The chamber moves to the next round.");
@@ -227,7 +228,7 @@ void TURN() {
         printf(RED);
     gun;
     print("%s-- ROULETTE --%s", CYN, reset);
-    print("There is (1) bullet in the chamber.");
+    print("There is (1) live round and (%i) blanks in the chamber.", round_count - 1);
 
     if (pointer >= round_count) pointer = 0;
 

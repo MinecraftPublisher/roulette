@@ -67,6 +67,8 @@ string concat(int count, ...) {
     return result;
 }
 
+int pointer;
+
 void report(bool turn, enum ACTION action) {
     if (!init) {
         size = 255;
@@ -83,7 +85,7 @@ void report(bool turn, enum ACTION action) {
     struct TURN *_turn = malloc(sizeof(struct TURN));
     _turn->turn        = turn;
     _turn->action      = action;
-    _turn->pointer     = ptr;
+    _turn->pointer     = pointer;
     _turn->revolver    = malloc(sizeof(byte) * round_count);
     for (int i = 0; i < round_count; i++) _turn->revolver[ i ] = revolver[ i ];
 
