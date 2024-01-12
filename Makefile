@@ -9,10 +9,10 @@ build_g: clean
 	clang -g roulette.c -o build/roulette
 
 run: build
-	./build/roulette
+	./build/roulette 3 fast
 
 debug: build_g
-	lldb ./build/roulette
+	lldb ./build/roulette 3 fast
 
 install: build
 	cp ./build/roulette /usr/local/bin/roulette

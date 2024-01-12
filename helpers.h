@@ -10,9 +10,9 @@ int TIME_MODE = 2;
 #define DEBUG_CONSTANT 1
 void msleep(double ms) { usleep((int) (ms * 1000 * TIME_MODE * 500 * DEBUG_CONSTANT)); }
 
-#define next()                                                                               \
-   pointer++;                                                                               \
-   if (pointer > round_count) pointer = 0
+#define next()                                                                                     \
+    pointer++;                                                                                     \
+    if (pointer > round_count - 1) pointer = 0
 
 #define back printf(BACK512 INDENT INDENT INDENT BACK512 BACK512)
 #define step                                                                                       \
