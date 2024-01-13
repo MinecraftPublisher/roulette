@@ -25,14 +25,19 @@ void END() {
     print();
 
     if (init) {
+        remove("output.roulette");
+        FILE *f = fopen("output.roulette", "w+");
+
         string report = generate();
         fprintf(stderr, "%s\n", report);
+        fprintf(f, "%s\n", report);
     }
 
     exit(0);
 }
 
 int chambersSinceLastRoll = 0;
+int remainder_rounds;
 
 void AI() {
     static bool  aiinit = false;
@@ -54,7 +59,7 @@ void AI() {
     msleep(2);
 
     // TODO: Implement better AI choice algorithm
-    int CAN_CHEAT = rand() % 100 < 5;
+    int CAN_CHEAT = rand() % 100 < 10;
     int AI_CHOICE = revolver[ pointer ] ? 33 : 15;
 
     if (!CAN_CHEAT) {
@@ -78,6 +83,8 @@ void AI() {
 
     if (AI_CHOICE < 32) { // point at self
         chambersSinceLastRoll++;
+        remainder_rounds--;
+
         report(false, SHOOT_A);
 
         print("Your enemy decides to shoot themselves.");
@@ -101,6 +108,8 @@ void AI() {
         }
     } else if (AI_CHOICE < 94) { // point at user
         chambersSinceLastRoll++;
+        remainder_rounds--;
+
         report(false, SHOOT_U);
 
         print("Your enemy decides to shoot you.");
@@ -124,6 +133,7 @@ void AI() {
         }
     } else { // roll chamber
         chambersSinceLastRoll = 0;
+        remainder_rounds = round_count - 1;
         report(false, ROLL);
 
         print(MAG "Your enemy decided to roll the chamber.");
@@ -160,6 +170,8 @@ void USER() {
     switch (choice) {
         case '1':
             chambersSinceLastRoll++;
+            remainder_rounds--;
+
             report(true, SHOOT_U);
 
             printf(INDENT RED "You put the gun on your head.");
@@ -185,6 +197,8 @@ void USER() {
             break;
         case '2':
             chambersSinceLastRoll++;
+            remainder_rounds--;
+
             report(true, SHOOT_A);
 
             printf(INDENT RED "You point the gun at your enemy.");
@@ -210,6 +224,8 @@ void USER() {
             break;
         case '3':
             chambersSinceLastRoll = 0;
+            remainder_rounds = round_count - 1;
+
             report(true, ROLL);
 
             print(MAG "Rolling the chamber...");
@@ -228,7 +244,7 @@ void TURN() {
         printf(RED);
     gun;
     print("%s-- ROULETTE --%s", CYN, reset);
-    print("There is (1) live round and (%i) blanks in the chamber.", round_count - 1);
+    print("There is (1) live round and (%i) blanks in the chamber.", remainder_rounds);
 
     if (pointer >= round_count) pointer = 0;
 
@@ -276,6 +292,8 @@ int main(int argc, char **argv) {
     } else {
         round_count = 6;
     }
+
+    remainder_rounds = round_count - 1;
 
     srand(time(NULL));
 

@@ -1,6 +1,7 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 typedef char byte;
 typedef byte bool;
@@ -122,8 +123,18 @@ string LINE(struct TURN t) {
 }
 
 string generate() {
-    string output = LINE(logs[ 0 ]);
-    for (int i = 1; i < ptr; i++) { output = concat(2, output, LINE(logs[ i ])); }
+    time_t timer;
+    char buffer[100];
+    struct tm* tm_info;
+
+    timer = time(NULL);
+    tm_info = localtime(&timer);
+
+    strftime(buffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
+
+    // don't hate me for adding a URL. you can always build without it.
+    string output = concat(3, "-- ROULETTE --\nURL: https://github.com/MinecraftPublisher/roulette\nPlayed at ", buffer, "\n");
+    for (int i = 0; i < ptr; i++) { output = concat(2, output, LINE(logs[ i ])); }
 
     return output;
 }
