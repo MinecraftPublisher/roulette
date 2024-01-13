@@ -1,9 +1,9 @@
+#include "argv.h"
 #include "helpers.h"
 #include "report.h"
 #include "styles.h"
 #include <stdarg.h>
 #include <stdio.h>
-#include <string.h>
 
 byte *revolver;
 
@@ -17,7 +17,7 @@ bool turn;
 
 void END() {
     usleep(10000);
-    printf(RED INDENT "GOOD. ");
+    printf(RED "%sGOOD. ", INDENT);
     fflush(stdout);
     msleep(1.5);
     printf("LUCK.\n" reset);
@@ -29,8 +29,8 @@ void END() {
         FILE *f = fopen("output.roulette", "w+");
 
         string report = generate();
-        fprintf(stderr, "%s\n", report);
-        fprintf(f, "%s\n", report);
+        if (!no_log) fprintf(stderr, "%s\n", report);
+        if (!no_report) fprintf(f, "%s\n", report);
     }
 
     exit(0);
@@ -64,7 +64,7 @@ void AI() {
 
     if (!CAN_CHEAT) {
         // Calculate the exact probability of the next chamber containing a bullet
-        float probability = 1.0f / (float)(remainder_rounds + 1);
+        float probability = 1.0f / (float) (remainder_rounds + 1);
 
         // Decide to shoot the user if the probability is low enough
         if (probability <= 0.2f) {
@@ -81,7 +81,6 @@ void AI() {
         }
     }
 
-
     aichoice[ aiptr ] = AI_CHOICE;
     aiptr++;
 
@@ -92,17 +91,17 @@ void AI() {
         report(false, SHOOT_A);
 
         print("Your enemy decides to shoot themselves.");
-        printf(INDENT RED "Your enemy points the gun at their own head.");
+        printf(RED "%sYour enemy points the gun at their own head.", INDENT);
         step;
 
         back;
-        printf(MAG INDENT "Your enemy pulls the trigger.");
+        printf(MAG "%sYour enemy pulls the trigger.", INDENT);
         step;
         msleep(1);
 
         back;
         if (revolver[ pointer ]) {
-            printf(RED INDENT "BANG!");
+            printf(RED "%sBANG!", INDENT);
             printf(GRN " Your enemy died. You win.\n");
             END();
         } else {
@@ -117,17 +116,17 @@ void AI() {
         report(false, SHOOT_U);
 
         print("Your enemy decides to shoot you.");
-        printf(INDENT RED "Your enemy points the gun at you.");
+        printf(RED "%sYour enemy points the gun at you.", INDENT);
         step;
 
         back;
-        printf(MAG INDENT "Your enemy pulls the trigger.");
+        printf(MAG "%sYour enemy pulls the trigger.", INDENT);
         step;
         msleep(1);
 
         back;
         if (revolver[ pointer ]) {
-            printf(RED INDENT "BANG!");
+            printf(RED "%sBANG!", INDENT);
             printf(" You died.\n");
             END();
         } else {
@@ -137,7 +136,7 @@ void AI() {
         }
     } else { // roll chamber
         chambersSinceLastRoll = 0;
-        remainder_rounds = round_count - 1;
+        remainder_rounds      = round_count - 1;
         report(false, ROLL);
 
         print(MAG "Your enemy decided to roll the chamber.");
@@ -155,7 +154,7 @@ void USER() {
     print("2. %sShoot your enemy%s", MAG, reset);
     print("3. %sRoll the chamber%s", BLU, reset);
     print("d. Exit");
-    printf("                              %s:", GRN);
+    printf("%s%s:", INDENT, GRN);
 
     system("/bin/stty raw");
     choice = getchar();
@@ -178,17 +177,17 @@ void USER() {
 
             report(true, SHOOT_U);
 
-            printf(INDENT RED "You put the gun on your head.");
+            printf(RED "%sYou put the gun on your head.", INDENT);
             step;
 
             back;
-            printf(MAG INDENT "You pull the trigger.");
+            printf(MAG "%sYou pull the trigger.", INDENT);
             step;
             msleep(1);
 
             back;
             if (revolver[ pointer ]) {
-                printf(RED INDENT "BANG!");
+                printf(RED "%sBANG!", INDENT);
                 printf(" You died.\n");
                 END();
             } else {
@@ -205,17 +204,17 @@ void USER() {
 
             report(true, SHOOT_A);
 
-            printf(INDENT RED "You point the gun at your enemy.");
+            printf(RED "%sYou point the gun at your enemy.", INDENT);
             step;
 
             back;
-            printf(MAG INDENT "You pull the trigger.");
+            printf(MAG "%sYou pull the trigger.", INDENT);
             step;
             msleep(1);
 
             back;
             if (revolver[ pointer ]) {
-                printf(RED INDENT "BANG!");
+                printf(RED "%sBANG!", INDENT);
                 printf(GRN " Your enemy died. You win. \n");
                 END();
             } else {
@@ -228,7 +227,7 @@ void USER() {
             break;
         case '3':
             chambersSinceLastRoll = 0;
-            remainder_rounds = round_count - 1;
+            remainder_rounds      = round_count - 1;
 
             report(true, ROLL);
 
@@ -257,45 +256,8 @@ void TURN() {
         AI();
 }
 
-void mode(char **argv) {
-    if (!strcmp(argv[ 2 ], "fast")) {
-        TIME_MODE = 1;
-    } else if (!strcmp(argv[ 2 ], "normal")) {
-        TIME_MODE = 2;
-    } else if (!strcmp(argv[ 2 ], "slow")) {
-        TIME_MODE = 4;
-    } else if (!strcmp(argv[ 2 ], "help") || !strcmp(argv[ 1 ], "?") || !strcmp(argv[ 1 ], "-h")) {
-        printf("Russian roulette\n");
-        printf("Play russian roulette in your CLI.\n");
-        printf("Options:\n");
-        printf("    %s  <rounds> <pace>\n", argv[ 0 ]);
-        printf("                 fast    - Play on fast mode. Half the stops.\n");
-        printf("                 normal  - Same as no arguments.\n");
-        printf("                 slow    - More drama. Double the stops.\n");
-        printf("        3 - 24           - Determine the number of rounds.\n");
-        ;
-
-        exit(0);
-    }
-}
-
-void COUNT_RC(char **argv) {
-    char *rounds = argv[ 1 ];
-    round_count  = atoi(rounds);
-    if (round_count < 3 || round_count > 24) {
-        printf("Too many/low number of rounds. Rounds should be between 3 and 24.\n");
-    }
-}
-
-int main(int argc, char **argv) {
-    if (argc >= 3) {
-        mode(argv);
-        COUNT_RC(argv);
-    } else if (argc == 2) {
-        COUNT_RC(argv);
-    } else {
-        round_count = 6;
-    }
+int main(int argc, string *argv) {
+    process_argv(argc, argv);
 
     remainder_rounds = round_count - 1;
 
@@ -311,7 +273,7 @@ int main(int argc, char **argv) {
     revolver = malloc(sizeof(bool) * round_count);
     msleep(1.5);
 
-    printf(INDENT "Filling the chamber... (");
+    printf("%sFilling the chamber... (", INDENT);
     msleep(0.5);
     int REV_C = point();
     for (int i = 0; i < round_count; i++) {

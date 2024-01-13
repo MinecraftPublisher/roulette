@@ -1,4 +1,6 @@
-#define INDENT "                               "
+#pragma once
+
+#define INDENT (no_center ? "" : "                               ")
 
 #define BACK1   "\r"
 #define BACK2   BACK1 BACK1
@@ -12,7 +14,8 @@
 #define BACK512 BACK256 BACK256
 
 #define print(...)                                                                                 \
-    printf(INDENT __VA_ARGS__);                                                                    \
+    printf(INDENT);                                                                                \
+    printf("" __VA_ARGS__);                                                                           \
     printf("\n")
 
 #define BLK "\e[0;30m"
@@ -32,6 +35,7 @@
     printf(reset)
 
 #define gun                                                                                        \
+    if (!no_logo)                                                                                  \
     printf("██                                                                          \n\
 ████                                                                        \n\
 ██░░████████████████████████████████████████████████████        ██████      \n\
