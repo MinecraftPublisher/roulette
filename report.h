@@ -1,4 +1,5 @@
 #include <stdarg.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -119,21 +120,37 @@ string LINE(struct TURN t) {
         " decides to ",
         action,
         ". ",
-        consequence);
+        t.action == 2 ? "\n\n" : consequence);
+}
+
+string itoa(int i) {
+    int    n = snprintf(NULL, 0, "%d", i) + 1;
+    string s = malloc(n);
+
+    if (s != NULL) snprintf(s, n, "%d", i);
+    return s;
 }
 
 string generate() {
-    time_t timer;
-    char buffer[100];
-    struct tm* tm_info;
+    time_t     timer;
+    char       buffer[ 100 ];
+    struct tm *tm_info;
 
-    timer = time(NULL);
+    timer   = time(NULL);
     tm_info = localtime(&timer);
 
     strftime(buffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
 
     // don't hate me for adding a URL. you can always build without it.
-    string output = concat(3, "-- ROULETTE --\nURL: https://github.com/MinecraftPublisher/roulette\nPlayed at ", buffer, "\n");
+    string output = concat(
+        7,
+        "-- ROULETTE --\nURL: https://github.com/MinecraftPublisher/roulette\nPlayed at ",
+        buffer,
+        "\nRounds: ",
+        itoa(round_count),
+        " (1 live round, ",
+        itoa(round_count - 1),
+        " blank rounds)\n\n");
     for (int i = 0; i < ptr; i++) { output = concat(2, output, LINE(logs[ i ])); }
 
     return output;

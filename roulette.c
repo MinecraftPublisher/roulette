@@ -63,20 +63,24 @@ void AI() {
     int AI_CHOICE = revolver[ pointer ] ? 33 : 15;
 
     if (!CAN_CHEAT) {
-        float probability = 1.0f / (float) (round_count - chambersSinceLastRoll);
-        if (probability > 0.25f) {
+        // Calculate the exact probability of the next chamber containing a bullet
+        float probability = 1.0f / (float)(remainder_rounds + 1);
+
+        // Decide to shoot the user if the probability is low enough
+        if (probability <= 0.2f) {
             AI_CHOICE = 90; // shoot the user
         } else {
-            int SHOULD_ROLL = rand() % 100;
-            if (SHOULD_ROLL < 10) { // roll the chamber
-                AI_CHOICE = 95;
-            } else if (SHOULD_ROLL < 40) { // shoot itself
-                AI_CHOICE = 30;
-            } else { // shoot the user
-                AI_CHOICE = 90;
+            // Risk assessment based on the game state
+            if (remainder_rounds > round_count / 2) {
+                // More rounds left, can take a risk
+                AI_CHOICE = (rand() % 100 < 30) ? 95 : 30; // roll the chamber or shoot itself
+            } else {
+                // Fewer rounds left, be cautious
+                AI_CHOICE = (rand() % 100 < 70) ? 90 : 95; // shoot the user or roll the chamber
             }
         }
     }
+
 
     aichoice[ aiptr ] = AI_CHOICE;
     aiptr++;
