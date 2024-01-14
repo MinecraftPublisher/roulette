@@ -7,7 +7,7 @@
 
 byte *revolver;
 
-int  pointer;
+int  revolver_pointer;
 char choice = 0;
 
 #define uturn true
@@ -39,113 +39,138 @@ void END() {
 int chambersSinceLastRoll = 0;
 int remainder_rounds;
 
+void TURN();
+
+enum NEXT_CHAMBER { BLANK_ROUND, LIVE_ROUND, NO_IDEA };
+
 void AI() {
-    static bool  aiinit = false;
-    static int   aisize = 255;
-    static byte *aichoice;
-    static int   aiptr;
+    static enum NEXT_CHAMBER next_chamber = NO_IDEA;
+
+    static bool         aiinit = false;
+    static int          aisize = 255;
+    static enum ACTION *aichoice;
+    static int          aiptr;
 
     if (!aiinit) {
-        aichoice = malloc(sizeof(int) * aisize);
+        aichoice = malloc(sizeof(enum ACTION) * aisize);
         aiinit   = true;
         aiptr    = 0;
     }
 
     if (aiptr == aisize - 1) {
         aisize += 255;
-        aichoice = realloc(aichoice, sizeof(int) * aisize);
+        aichoice = realloc(aichoice, sizeof(enum ACTION) * aisize);
     }
 
     msleep(2);
 
     // TODO: Implement better AI choice algorithm
-    int CAN_CHEAT = rand() % 100 < 10;
-    int AI_CHOICE = revolver[ pointer ] ? 33 : 15;
+    int         CAN_CHEAT = rand() % 100 < 10;
+    enum ACTION ai_choice = revolver[ revolver_pointer ] ? SHOOT_U : SHOOT_A;
 
-    if (!CAN_CHEAT) {
+    if (!CAN_CHEAT && next_chamber == NO_IDEA) {
         // Calculate the exact probability of the next chamber containing a bullet
         float probability = 1.0f / (float) (remainder_rounds + 1);
 
         // Decide to shoot the user if the probability is low enough
         if (probability <= 0.2f) {
-            AI_CHOICE = 90; // shoot the user
+            ai_choice = SHOOT_U; // shoot the user
         } else {
             // Risk assessment based on the game state
             if (remainder_rounds > round_count / 2) {
                 // More rounds left, can take a risk
-                AI_CHOICE = (rand() % 100 < 30) ? 95 : 30; // roll the chamber or shoot itself
+                ai_choice
+                    = (rand() % 100 < 40) ? ROLL : SHOOT_A; // roll the chamber or shoot itself
             } else {
                 // Fewer rounds left, be cautious
-                AI_CHOICE = (rand() % 100 < 70) ? 90 : 95; // shoot the user or roll the chamber
+                ai_choice
+                    = (rand() % 100 < 70) ? SHOOT_U : ROLL; // shoot the user or roll the chamber
             }
         }
     }
 
-    aichoice[ aiptr ] = AI_CHOICE;
+    aichoice[ aiptr ] = ai_choice;
     aiptr++;
 
-    if (AI_CHOICE < 32) { // point at self
-        chambersSinceLastRoll++;
-        remainder_rounds--;
+    switch (ai_choice) {
+        case SHOOT_A:
+            chambersSinceLastRoll++;
+            remainder_rounds--;
 
-        report(false, SHOOT_A);
+            report(aturn, SHOOT_A);
 
-        print("Your enemy decides to shoot themselves.");
-        printf(RED "%sYour enemy points the gun at their own head.", INDENT);
-        step;
+            print("Your enemy decides to shoot themselves.");
+            printf(RED "%sYour enemy points the gun at their own head.", INDENT);
+            step;
 
-        back;
-        printf(MAG "%sYour enemy pulls the trigger.", INDENT);
-        step;
-        msleep(1);
+            back;
+            printf(MAG "%sYour enemy pulls the trigger.", INDENT);
+            step;
+            msleep(1);
 
-        back;
-        if (revolver[ pointer ]) {
-            printf(RED "%sBANG!", INDENT);
-            printf(GRN " Your enemy died. You win.\n");
-            END();
-        } else {
-            print(RED "Your enemy has lived. The chamber moves to the next round.");
-            next();
-            turn = aturn;
-        }
-    } else if (AI_CHOICE < 94) { // point at user
-        chambersSinceLastRoll++;
-        remainder_rounds--;
+            back;
+            if (revolver[ revolver_pointer ]) {
+                printf(RED "%sBANG!", INDENT);
+                printf(GRN " Your enemy died. You win.\n");
+                END();
+            } else {
+                print(RED "Your enemy did not die. The chamber moves to the next round.");
+                next();
+                turn = aturn;
+            }
 
-        report(false, SHOOT_U);
+            break;
+        case SHOOT_U:
+            chambersSinceLastRoll++;
+            remainder_rounds--;
 
-        print("Your enemy decides to shoot you.");
-        printf(RED "%sYour enemy points the gun at you.", INDENT);
-        step;
+            report(aturn, SHOOT_U);
 
-        back;
-        printf(MAG "%sYour enemy pulls the trigger.", INDENT);
-        step;
-        msleep(1);
+            print("Your enemy decides to shoot you.");
+            printf(RED "%sYour enemy points the gun at you.", INDENT);
+            step;
 
-        back;
-        if (revolver[ pointer ]) {
-            printf(RED "%sBANG!", INDENT);
-            printf(" You died.\n");
-            END();
-        } else {
-            print(GRN "You have lived. The chamber moves to the next round.");
-            next();
+            back;
+            printf(MAG "%sYour enemy pulls the trigger.", INDENT);
+            step;
+            msleep(1);
+
+            back;
+            if (revolver[ revolver_pointer ]) {
+                printf(RED "%sBANG!", INDENT);
+                printf(" You died.\n");
+                END();
+            } else {
+                print(GRN "You did not die. The chamber moves to the next round.");
+                next();
+                turn = uturn;
+            }
+
+            break;
+        case ROLL:
+            chambersSinceLastRoll = 0;
+            remainder_rounds      = round_count - 1;
+            report(aturn, ROLL);
+
+            print(MAG "Your enemy decided to roll the chamber.");
+            revolver_pointer = point();
+            msleep(1.5);
             turn = uturn;
-        }
-    } else { // roll chamber
-        chambersSinceLastRoll = 0;
-        remainder_rounds      = round_count - 1;
-        report(false, ROLL);
 
-        print(MAG "Your enemy decided to roll the chamber.");
-        pointer = point();
-        msleep(1.5);
-        turn = uturn;
+            break;
+        case CHECK_CHAMBER:
+            report(aturn, CHECK_CHAMBER);
+            
+            print(BLU "Your enemy decides to check the chamber.");
+            print(RED "\"VERY INTERESTING.\"");
+            next_chamber = revolver[ revolver_pointer ];
+
+            turn = uturn;
+            break;
     }
 
-    msleep(2);
+    if (choice != CHECK_CHAMBER) next_chamber = NO_IDEA;
+    msleep(2.5);
 }
 
 void USER() {
@@ -153,6 +178,7 @@ void USER() {
     print("1. %sShoot yourself%s", RED, reset);
     print("2. %sShoot your enemy%s", MAG, reset);
     print("3. %sRoll the chamber%s", BLU, reset);
+    print("4. %sCheck the chamber%s", BLU, reset);
     print("d. Exit");
     printf("%s%s:", INDENT, GRN);
 
@@ -162,20 +188,22 @@ void USER() {
     if (choice == 'd' || choice == 'D') {
         clear;
         gun;
-        print("%s-- ROULETTE --%s", CYN, reset);
+        print(CYN "-- ROULETTE --%s", reset);
         END();
     }
 
     clear;
     gun;
-    print("%s-- ROULETTE --%s", CYN, reset);
+    print("-- ROULETTE --%s", reset);
 
-    switch (choice) {
-        case '1':
+    enum ACTION chc = choice - '1';
+
+    switch (chc) {
+        case SHOOT_U:
             chambersSinceLastRoll++;
             remainder_rounds--;
 
-            report(true, SHOOT_U);
+            report(uturn, SHOOT_U);
 
             printf(RED "%sYou put the gun on your head.", INDENT);
             step;
@@ -186,7 +214,7 @@ void USER() {
             msleep(1);
 
             back;
-            if (revolver[ pointer ]) {
+            if (revolver[ revolver_pointer ]) {
                 printf(RED "%sBANG!", INDENT);
                 printf(" You died.\n");
                 END();
@@ -198,11 +226,11 @@ void USER() {
 
             msleep(3);
             break;
-        case '2':
+        case SHOOT_A:
             chambersSinceLastRoll++;
             remainder_rounds--;
 
-            report(true, SHOOT_A);
+            report(uturn, SHOOT_A);
 
             printf(RED "%sYou point the gun at your enemy.", INDENT);
             step;
@@ -213,7 +241,7 @@ void USER() {
             msleep(1);
 
             back;
-            if (revolver[ pointer ]) {
+            if (revolver[ revolver_pointer ]) {
                 printf(RED "%sBANG!", INDENT);
                 printf(GRN " Your enemy died. You win. \n");
                 END();
@@ -225,17 +253,29 @@ void USER() {
 
             msleep(3);
             break;
-        case '3':
+        case ROLL:
             chambersSinceLastRoll = 0;
             remainder_rounds      = round_count - 1;
 
-            report(true, ROLL);
+            report(uturn, ROLL);
 
             print(MAG "Rolling the chamber...");
-            pointer = point();
+            revolver_pointer = point();
             msleep(1.5);
             turn = aturn;
 
+            break;
+        case CHECK_CHAMBER:
+            report(uturn, CHECK_CHAMBER);
+
+            printf(BLU "%sYou decide to check the chamber.", INDENT);
+            step;
+
+            back;
+            print("It is a %s round. Good luck.", revolver[ revolver_pointer ] ? "live" : "blank");
+
+            msleep(5);
+            turn = aturn;
             break;
     }
 }
@@ -249,11 +289,10 @@ void TURN() {
     print("%s-- ROULETTE --%s", CYN, reset);
     print("There is (1) live round and (%i) blanks in the chamber.", remainder_rounds);
 
-    if (pointer >= round_count) pointer = 0;
+    if (revolver_pointer >= round_count) revolver_pointer = 0;
 
     if (turn) USER();
-    else
-        AI();
+    else { AI(); }
 }
 
 int main(int argc, string *argv) {
@@ -290,10 +329,10 @@ int main(int argc, string *argv) {
         }
     }
     printf(reset ")\n");
-    msleep(1.5);
+    msleep(2.5);
 
     print("Rolling the chamber...");
-    pointer = point();
+    revolver_pointer = point();
     msleep(1.5);
 
     turn = random() % 2;

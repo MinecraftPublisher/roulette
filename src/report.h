@@ -11,7 +11,10 @@ typedef byte bool;
 #define false 0
 #define true  1
 
-enum ACTION { SHOOT_U, SHOOT_A, ROLL };
+#define uturn true
+#define aturn false
+
+enum ACTION { SHOOT_U, SHOOT_A, ROLL, CHECK_CHAMBER };
 
 struct TURN {
     bool        turn;
@@ -71,7 +74,7 @@ string concat(int count, ...) {
     return result;
 }
 
-int pointer;
+int revolver_pointer;
 
 void report(bool turn, enum ACTION action) {
     if (!init) {
@@ -89,7 +92,7 @@ void report(bool turn, enum ACTION action) {
     struct TURN *_turn = malloc(sizeof(struct TURN));
     _turn->turn        = turn;
     _turn->action      = action;
-    _turn->pointer     = pointer;
+    _turn->pointer     = revolver_pointer;
     _turn->revolver    = malloc(sizeof(byte) * round_count);
     for (int i = 0; i < round_count; i++) _turn->revolver[ i ] = revolver[ i ];
 
@@ -98,10 +101,15 @@ void report(bool turn, enum ACTION action) {
 }
 
 string LINE(struct TURN t) {
-    string player = t.turn ? "user" : "ai";
-    string action = t.action == 0   ? (t.turn ? "shoot themselves" : "shoot the user")
-                    : t.action == 1 ? (t.turn ? "shoot the enemy" : "shoot themselves")
-                                    : "roll the chamber";
+    string player = t.turn ? "user" : "enemy";
+    string action = t.action == SHOOT_U ? (t.turn == uturn ? "shoot themselves" : "shoot the user")
+                    : t.action == SHOOT_A ? (t.turn ? "shoot the enemy" : "shoot themselves")
+                    : t.action == ROLL    ? "roll the chamber"
+                                          : concat(
+                                           3,
+                                           "check the chamber, It was a ",
+                                           t.revolver[ t.pointer ] ? "live" : "blank",
+                                           " round");
 
     string revolver_out = malloc(sizeof(char) * round_count);
     for (int i = 0; i < round_count; i++) revolver_out[ i ] = t.revolver[ i ] ? '@' : 'O';
@@ -122,7 +130,7 @@ string LINE(struct TURN t) {
         " decides to ",
         action,
         ". ",
-        t.action == 2 ? "\n\n" : consequence);
+        t.action > 1 ? "\n\n" : consequence);
 }
 
 string itoa(int i) {

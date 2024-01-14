@@ -16,7 +16,7 @@
 
 #define print(...)                                                                                 \
     printf(INDENT);                                                                                \
-    printf("" __VA_ARGS__);                                                                           \
+    printf("" __VA_ARGS__);                                                                        \
     printf("\n")
 
 #define BLK "\e[0;30m"
