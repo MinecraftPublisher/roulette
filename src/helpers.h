@@ -15,7 +15,7 @@ void msleep(double ms) { usleep((int) (ms * 1000 * TIME_MODE * 250 * DEBUG_CONST
     pointer++;                                                                                     \
     if (pointer > round_count - 1) pointer = 0
 
-#define back printf(BACK512 BACK512 BACK512 "%s%s%s", INDENT, INDENT, INDENT)
+#define back printf(INCENT INCENT INCENT BACK512 INCENT INCENT); printf(BACK512)
 #define step                                                                                       \
     fflush(stdout);                                                                                \
     msleep(0.5);                                                                                   \

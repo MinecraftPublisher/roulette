@@ -16,8 +16,6 @@ void process_argv(int argc, string *argv) {
     for (int i = 1; i < argc; i++) {
         string cur = argv[ i ];
 
-        msleep(1);
-
         // -------------- SPEED SETTINGS  -------------
         if (!strcmp(cur, "flash")) TIME_MODE = 1;
         else if (!strcmp(cur, "fast"))

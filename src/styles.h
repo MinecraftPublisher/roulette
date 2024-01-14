@@ -1,6 +1,7 @@
 #pragma once
 
 #define INDENT (no_center ? "" : "                               ")
+#define INCENT "                               "
 
 #define BACK1   "\r"
 #define BACK2   BACK1 BACK1
