@@ -1,3 +1,5 @@
+all: run
+
 clean:
 	rm -rf ./build
 	mkdir ./build/
@@ -12,10 +14,13 @@ build_r: clean
 	clang src/roulette.c -O3 -o build/roulette
 
 run: build
-	./build/roulette r:3 fast ncenter nlogo
+	./build/roulette r:4 fast ncenter nlogo nrep
 
 debug: build_g
-	lldb ./build/roulette r:3 fast ncenter nlogo
+	lldb ./build/roulette r:4 fast ncenter nlogo nrep
+
+run_iterm: build
+	bash run_iterm.sh
 
 install: build_r
 	cp ./build/roulette /usr/local/bin/roulette

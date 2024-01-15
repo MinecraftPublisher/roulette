@@ -2,13 +2,13 @@
 #include "helpers.h"
 #include "report.h"
 #include "styles.h"
-#include <stdarg.h>
 #include <stdio.h>
 
+// excuse me for the interesting naming conventions :)
 byte *revolver;
 
 int  revolver_pointer;
-char choice = 0;
+char user_choice = 0;
 
 #define uturn true
 #define aturn false
@@ -25,12 +25,14 @@ void END() {
     print();
 
     if (init) {
-        remove("output.roulette");
-        FILE *f = fopen("output.roulette", "w+");
-
         string report = generate();
         if (!no_log) fprintf(stderr, "%s\n", report);
-        if (!no_report) fprintf(f, "%s\n", report);
+        if (!no_report) {
+            remove("output.roulette");
+            FILE *f = fopen("output.roulette", "w+");
+
+            fprintf(f, "%s\n", report);
+        }
     }
 
     exit(0);
@@ -160,7 +162,7 @@ void AI() {
             break;
         case CHECK_CHAMBER:
             report(aturn, CHECK_CHAMBER);
-            
+
             print(BLU "Your enemy decides to check the chamber.");
             print(RED "\"VERY INTERESTING.\"");
             next_chamber = revolver[ revolver_pointer ];
@@ -169,7 +171,7 @@ void AI() {
             break;
     }
 
-    if (choice != CHECK_CHAMBER) next_chamber = NO_IDEA;
+    if (user_choice != CHECK_CHAMBER) next_chamber = NO_IDEA;
     msleep(2.5);
 }
 
@@ -182,10 +184,19 @@ void USER() {
     print("d. Exit");
     printf("%s%s:", INDENT, GRN);
 
-    system("/bin/stty raw");
-    choice = getchar();
+    system("/bin/stty raw"); // setting terminal output to raw in order to get a single character as input
+    
+    // repeat until we get a valid character
+    _getchar:
+    user_choice = getchar();
+    while(!(user_choice == 'd' || user_choice == 'D' || (user_choice >= '1' && user_choice <= '4'))) {
+        printf("hi\n");
+        goto _getchar;
+    }
+    
     system("/bin/stty cooked");
-    if (choice == 'd' || choice == 'D') {
+    
+    if (user_choice == 'd' || user_choice == 'D') {
         clear;
         gun;
         print(CYN "-- ROULETTE --%s", reset);
@@ -196,7 +207,7 @@ void USER() {
     gun;
     print("-- ROULETTE --%s", reset);
 
-    enum ACTION chc = choice - '1';
+    enum ACTION chc = user_choice - '1';
 
     switch (chc) {
         case SHOOT_U:
@@ -276,6 +287,10 @@ void USER() {
 
             msleep(5);
             turn = aturn;
+            break;
+        default:
+            // if the choice is invalid, simply return to the turn screen. how did the user even get here???
+            TURN();
             break;
     }
 }
