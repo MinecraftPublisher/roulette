@@ -189,10 +189,7 @@ void USER() {
     // repeat until we get a valid character
     _getchar:
     user_choice = getchar();
-    while(!(user_choice == 'd' || user_choice == 'D' || (user_choice >= '1' && user_choice <= '4'))) {
-        printf("hi\n");
-        goto _getchar;
-    }
+    while(!(user_choice == 'd' || user_choice == 'D' || (user_choice >= '1' && user_choice <= '4'))) goto _getchar;
     
     system("/bin/stty cooked");
     
