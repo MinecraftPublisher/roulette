@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ROULETTE_HEADER_HELPERS_H
+#define __ROULETTE_HEADER_HELPERS_H
 
 #include "argv.h"
 #include <stdlib.h>
@@ -28,3 +29,5 @@ void msleep(double ms) { usleep((int) (ms * 1000 * TIME_MODE * 250 * DEBUG_CONST
     printf(".");                                                                                   \
     fflush(stdout);                                                                                \
     msleep(1.5)
+
+#endif

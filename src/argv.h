@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ROULETTE_HEADER_ARGV_H
+#define __ROULETTE_HEADER_ARGV_H
 
 #include "report.h"
 
@@ -109,3 +110,5 @@ void process_argv(int argc, string *argv) {
         // -------------- HELP SETTINGS  --------------
     }
 }
+
+#endif

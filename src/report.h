@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ROULETTE_HEADER_REPORT_H
+#define __ROULETTE_HEADER_REPORT_H
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -165,3 +166,5 @@ string generate() {
 
     return output;
 }
+
+#endif

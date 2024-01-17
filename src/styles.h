@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ROULETTE_HEADER_STYLES_H
+#define __ROULETTE_HEADER_STYLES_H
 
 #define INDENT (no_center ? "" : "                               ")
 #define INCENT "                               "
@@ -59,3 +60,5 @@
                                                               ██▓▓▓▓▓▓▓▓▓▓██\n\
                                                                 ██████████  \n\
 ")
+
+#endif
