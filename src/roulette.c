@@ -187,9 +187,10 @@ int main(int argc, string *argv) {
         while(revolver[RAND]) RAND = point();
         revolver[RAND] = true;
     }
-    for(int i = 0; i < round_count; i++) {
+    
+    for(int i = 0; i < round_count; i++) { // print aesthetic
         if(revolver[i]) {
-            printf(RED "@");
+            printf(RED ">");
             fflush(stdout);
             msleep(0.35);
         } else {
@@ -198,6 +199,7 @@ int main(int argc, string *argv) {
             msleep(0.2);
         }
     }
+    
     printf(reset ")\n");
     msleep(2.5);
     
