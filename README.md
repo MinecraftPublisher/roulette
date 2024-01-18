@@ -19,11 +19,11 @@ You can insert any of the following in any order:
 
 ## Examples
     roulette flash nlog nrep r:24
-    |- Play on the fastest time, Do not log and Do not report, 24 rounds.
+    ❖ Play on the fastest time, Do not log and Do not report, 24 rounds.
     roulette slow r:8
-    |- Play on the slowest time, 8 rounds.
+    ❖ Play on the slowest time, 8 rounds.
     roulette flash r:15 l:9
-    |- Play with 9 live bullets and 6 blanks. Fastest time.
+    ❖ Play with 9 live bullets and 6 blanks. Fastest time.
 
 ## Building & Installation
 - Build with `make build`.
