@@ -32,11 +32,11 @@
 #define reset       "\e[0m"
 #define COLOR_RESET "\e[0m"
 
-#define clear                                                                                      \
+#define clear()                                                                                      \
     printf("\e[1;1H\e[2J");                                                                        \
     printf(reset)
 
-#define gun                                                                                        \
+#define gun()                                                                                        \
     if (!no_logo)                                                                                  \
     printf("██                                                                          \n\
 ████                                                                        \n\

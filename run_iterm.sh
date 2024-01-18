@@ -14,4 +14,4 @@
 #	return x;
 #}
 
-echo -e "tell application \"iTerm\"\ncreate window with default profile\ntell current session of current window\ndelay 1\nwrite text \"cd $PWD\"\nwrite text \"build/roulette r:4 flash ncenter nlogo nrep; anykey \\\"Press any key to continue...\\\"\"\nend tell\nend tell\nEOF" | osascript
+echo -e "tell application \"iTerm\"\ncreate window with default profile\ntell current session of current window\ndelay 1\nwrite text \"cd $PWD\"\nwrite text \"build/roulette r:4 l:2 flash ncenter nlogo nrep; anykey \\\"Press any key to continue...\\\"\"\nend tell\nend tell\nEOF" | osascript

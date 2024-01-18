@@ -1,14 +1,13 @@
 #ifndef __ROULETTE_HEADER_HELPERS_H
 #define __ROULETTE_HEADER_HELPERS_H
 
-#include "argv.h"
+#include "defines.h"
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
 
 int point() { return rand() % round_count; }
 
-#define DEBUG_CONSTANT 1
 void msleep(double ms) { usleep((int) (ms * 1000 * TIME_MODE * 250 * DEBUG_CONSTANT)); }
 
 #define next()                                                                                     \

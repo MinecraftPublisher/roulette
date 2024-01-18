@@ -2,23 +2,10 @@
 #define __ROULETTE_HEADER_AI_H
 
 #include "helpers.h"
+#include "report.h"
 #include "styles.h"
-
 #include <stdio.h>
 #include <stdlib.h>
-
-#define false 0
-#define true  1
-
-bool turn;
-
-int chambersSinceLastRoll = 0;
-int remainder_rounds;
-
-void TURN();
-void END();
-
-enum NEXT_CHAMBER { BLANK_ROUND, LIVE_ROUND, NO_IDEA };
 
 void AI() {
     static enum NEXT_CHAMBER next_chamber = NO_IDEA;
@@ -42,15 +29,16 @@ void AI() {
     msleep(2);
 
     // TODO: Implement better AI choice algorithm
-    int         CAN_CHEAT = rand() % 100 < 10;
+    int         CAN_CHEAT = rand() % 100 < 5;
     enum ACTION ai_choice = revolver[ revolver_pointer ] ? SHOOT_U : SHOOT_A;
 
+    // If cheating isn't allowed and the AI doesn't know what the next chamber is
     if (!CAN_CHEAT && next_chamber == NO_IDEA) {
         // Calculate the exact probability of the next chamber containing a bullet
-        float probability = 1.0f / (float) (remainder_rounds + 1);
+        float probability = (float) live_rounds / (float) round_count;
 
-        // Decide to shoot the user if the probability is low enough
-        if (probability <= 0.2f) {
+        // Decide to shoot the user if the probability is high enough
+        if (probability >= 0.5f) {
             ai_choice = SHOOT_U; // shoot the user
         } else {
             // Risk assessment based on the game state
@@ -126,7 +114,7 @@ void AI() {
             break;
         case ROLL:
             chambersSinceLastRoll = 0;
-            remainder_rounds      = round_count - 1;
+            remainder_rounds      = round_count - live_rounds - 1;
             report(aturn, ROLL);
 
             print(MAG "Your enemy decided to roll the chamber.");

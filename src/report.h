@@ -1,38 +1,21 @@
 #ifndef __ROULETTE_HEADER_REPORT_H
 #define __ROULETTE_HEADER_REPORT_H
 
+#include "defines.h"
+
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
-typedef char byte;
-typedef byte bool;
-#define false 0
-#define true  1
+bool no_report = false;
+bool no_log    = false;
+bool no_logo   = false;
+bool no_center = false;
 
-#define uturn true
-#define aturn false
-
-enum ACTION { SHOOT_U, SHOOT_A, ROLL, CHECK_CHAMBER };
-
-struct TURN {
-    bool        turn;
-    enum ACTION action;
-    byte       *revolver;
-    int         pointer;
-};
-
-int   round_count;
-byte *revolver;
-
-int          size;
-int          ptr;
-struct TURN *logs;
-bool         init;
-
-typedef char *string;
+int TIME_MODE   = 4;
+int round_count = 6;
 
 string concatC(string left, string right) {
     int left_s  = strlen(left);
@@ -78,16 +61,16 @@ string concat(int count, ...) {
 int revolver_pointer;
 
 void report(bool turn, enum ACTION action) {
-    if (!init) {
-        size = 255;
-        logs = malloc(sizeof(struct TURN) * size);
-        init = true;
-        ptr  = 0;
+    if (!report_initialized) {
+        report_size = 255;
+        report_logs = malloc(sizeof(struct TURN) * report_size);
+        report_initialized = true;
+        report_pointer  = 0;
     }
 
-    if (ptr == size - 1) {
-        size += 255;
-        logs = realloc(logs, sizeof(struct TURN) * size);
+    if (report_pointer == report_size - 1) {
+        report_size += 255;
+        report_logs = realloc(report_logs, sizeof(struct TURN) * report_size);
     }
 
     struct TURN *_turn = malloc(sizeof(struct TURN));
@@ -97,8 +80,8 @@ void report(bool turn, enum ACTION action) {
     _turn->revolver    = malloc(sizeof(byte) * round_count);
     for (int i = 0; i < round_count; i++) _turn->revolver[ i ] = revolver[ i ];
 
-    logs[ ptr ] = *_turn;
-    ptr++;
+    report_logs[ report_pointer ] = *_turn;
+    report_pointer++;
 }
 
 string LINE(struct TURN t) {
@@ -162,7 +145,7 @@ string generate() {
         " (1 live round, ",
         itoa(round_count - 1),
         " blank rounds)\n\n");
-    for (int i = 0; i < ptr; i++) { output = concat(2, output, LINE(logs[ i ])); }
+    for (int i = 0; i < report_pointer; i++) { output = concat(2, output, LINE(report_logs[ i ])); }
 
     return output;
 }

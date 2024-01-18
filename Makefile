@@ -14,10 +14,10 @@ build_r: clean
 	clang src/roulette.c -O3 -o build/roulette
 
 run: build
-	./build/roulette r:4 fast ncenter nlogo nrep
+	./build/roulette r:4 l:2 flash ncenter nlogo nrep
 
 debug: build_g
-	lldb ./build/roulette r:4 fast ncenter nlogo nrep
+	lldb ./build/roulette r:4 l:2 flash ncenter nlogo nrep
 
 run_iterm: build
 	bash run_iterm.sh
