@@ -1,6 +1,8 @@
 #ifndef __ROULETTE_DEFINES_H
 #define __ROULETTE_DEFINES_H
 
+#include "styles.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -61,39 +63,49 @@ int round_count;
 
 void msleep(double ms);
 
-void memory_error() {
+void memory_error(string __FILE, int __LINE) {
     printf("Memory error occured.\n"
         "This usually means the system didn't give me memory,\n"
         "Or the system doesn't even have enough memory to give it to me.\n"
         "This usually cannot be recovered from, And I would have to close the app.\n"
-        "Sorry about that!\n");
+        "Sorry about that!\n\nTechnical details:\nFile name: %s\nLine number: %d\n", __FILE, __LINE);
     exit(EXIT_FAILURE);
 }
 
 #define E_ALLOC_LIMIT 50
 
-void *e_malloc(size_t size) {
+void *__e_malloc(size_t size, string __FILE, int __LINE) {
     void *result = malloc(size);
     int i = 0;
     while(result == NULL && i < E_ALLOC_LIMIT) {
         msleep(0.01);
         result = malloc(size);
     }
-    if(result == NULL) memory_error();
+    if(result == NULL) memory_error(__FILE, __LINE);
 
     return result;
 }
 
-void *e_realloc(void *ptr, size_t size) {
+void *__e_realloc(void *ptr, size_t size, string __FILE, int __LINE) {
     void *result = realloc(ptr, size);
     int i = 0;
     while(result == NULL && i < E_ALLOC_LIMIT) {
         msleep(0.01);
         result = realloc(ptr, size);
     }
-    if(result == NULL) memory_error();
+    if(result == NULL) memory_error(__FILE, __LINE);
     
     return result;
+}
+
+#define e_malloc(size) __e_malloc(size, __FILE__, __LINE__)
+#define e_realloc(ptr, size) __e_realloc(ptr, size, __FILE__, __LINE__)
+
+void anykey() {
+    print(BLU "\nPress any key to continue..." reset);
+    system("/bin/stty raw");
+    getchar();
+    system("/bin/stty cooked");
 }
 
 #endif
