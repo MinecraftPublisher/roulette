@@ -14,9 +14,7 @@ void msleep(double ms) { usleep((int) (ms * 1000 * TIME_MODE * 250 * DEBUG_CONST
     revolver_pointer++;                                                                            \
     if (revolver_pointer > round_count - 1) revolver_pointer = 0
 
-#define back                                                                                       \
-    printf(INCENT INCENT INCENT BACK512 INCENT INCENT);                                            \
-    printf(BACK512)
+#define back printf("\33[2K\r");
 #define step                                                                                       \
     fflush(stdout);                                                                                \
     msleep(0.5);                                                                                   \

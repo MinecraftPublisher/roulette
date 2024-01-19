@@ -51,12 +51,12 @@ void USER() {
 _getchar:
     user_choice = getchar();
     while (
-        !(user_choice == 'd' || user_choice == 'D' || (user_choice >= '1' && user_choice <= '4')))
+        !(user_choice == 'd' || user_choice == 'D' || user_choice < 10 || (user_choice >= '1' && user_choice <= '4')))
         goto _getchar;
 
     system("/bin/stty cooked");
 
-    if (user_choice == 'd' || user_choice == 'D') {
+    if (user_choice == 'd' || user_choice == 'D' || user_choice < 10) {
         clear();
         gun();
         print(CYN "-- ROULETTE --%s", reset);
@@ -126,7 +126,7 @@ _getchar:
             break;
         case ROLL:
             chambersSinceLastRoll = 0;
-            remainder_rounds      = round_count - live_rounds - 1;
+            remainder_rounds      = round_count - live_rounds;
 
             report(uturn, ROLL);
 

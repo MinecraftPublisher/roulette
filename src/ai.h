@@ -118,7 +118,7 @@ void AI() {
             break;
         case ROLL:
             chambersSinceLastRoll = 0;
-            remainder_rounds      = round_count - live_rounds - 1;
+            remainder_rounds      = round_count - live_rounds;
             report(aturn, ROLL);
 
             print(MAG "Your enemy decided to roll the chamber.");
