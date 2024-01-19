@@ -15,12 +15,15 @@ void END() {
     msleep(1.5);
 
     anykey();
-    print();
-
     if (report_initialized) {
         string report = generate();
-        if (!no_log) fprintf(stderr, "%s\n", report);
+        if (!no_log) {
+            print();
+            fprintf(stderr, "%s\n", report);
+        }
+        
         if (!no_report) {
+            print();
             remove("output.roulette");
             FILE *f = fopen("output.roulette", "w+");
 
