@@ -15,12 +15,12 @@ void AI() {
     static int          ai_size = 255;
     static enum ACTION *ai_choice_history;
     static int          ai_pointer;
-    static enum ACTION ai_choice = -1;
+    static enum ACTION  ai_choice = -1;
 
     if (!ai_init) {
         ai_choice_history = e_malloc(sizeof(enum ACTION) * ai_size);
-        ai_init   = true;
-        ai_pointer    = 0;
+        ai_init           = true;
+        ai_pointer        = 0;
     }
 
     if (ai_pointer == ai_size - 1) {
@@ -33,8 +33,8 @@ void AI() {
     if (ai_choice != CHECK_CHAMBER) next_chamber = NO_IDEA;
 
     // TODO: Implement better AI choice algorithm
-    int         CAN_CHEAT = rand() % 100 < 5;
-    ai_choice = revolver[ revolver_pointer ] ? SHOOT_U : SHOOT_A;
+    int CAN_CHEAT = rand() % 100 < 5;
+    ai_choice     = revolver[ revolver_pointer ] ? SHOOT_U : SHOOT_A;
 
     // If cheating isn't allowed and the AI doesn't know what the next chamber is
     if (!CAN_CHEAT && next_chamber == NO_IDEA) {

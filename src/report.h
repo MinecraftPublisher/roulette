@@ -2,7 +2,6 @@
 #define __ROULETTE_HEADER_REPORT_H
 
 #include "defines.h"
-
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -62,10 +61,10 @@ int revolver_pointer;
 
 void report(bool turn, enum ACTION action) {
     if (!report_initialized) {
-        report_size = 255;
-        report_logs = e_malloc(sizeof(struct TURN) * report_size);
+        report_size        = 255;
+        report_logs        = e_malloc(sizeof(struct TURN) * report_size);
         report_initialized = true;
-        report_pointer  = 0;
+        report_pointer     = 0;
     }
 
     if (report_pointer == report_size - 1) {

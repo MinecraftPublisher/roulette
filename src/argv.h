@@ -7,7 +7,7 @@
 
 void process_argv(int argc, string *argv) {
     bool did_set_round_count = false;
-    bool did_set_live_count = false;
+    bool did_set_live_count  = false;
 
     live_rounds = 1;
 
@@ -53,38 +53,37 @@ void process_argv(int argc, string *argv) {
 
         // -------------- ROUND SETTINGS  -------------
         else if (!strncmp(cur, "r:", 2)) {
-            if(did_set_round_count) {
+            if (did_set_round_count) {
                 printf("ERROR: Cannot override round count. Already set to %i.\n", round_count);
                 exit(1);
             }
-            
+
             did_set_round_count = true;
-            
+
             round_count = atoi(&cur[ 2 ]);
             if (round_count < 3) {
-                printf(
-                    "Not enough rounds. Rounds should be more than 3. Got: %i\n",
-                    round_count);
+                printf("Not enough rounds. Rounds should be more than 3. Got: %i\n", round_count);
             }
         }
 
         else if (!strncmp(cur, "l:", 2)) {
-            if(did_set_live_count) {
+            if (did_set_live_count) {
                 printf("ERROR: Cannot override live rounds. Already set to %i.\n", live_rounds);
                 exit(1);
             }
-            
-            if(!did_set_round_count) {
+
+            if (!did_set_round_count) {
                 printf("ERROR: Cannot set live rounds before setting total rounds.\n");
                 exit(1);
             }
-            
+
             did_set_live_count = true;
-            
+
             live_rounds = atoi(&cur[ 2 ]);
             if (live_rounds < 1 || live_rounds >= round_count) {
                 printf(
-                    "%s live rounds. Rounds should be between 1 and the number of rounds minus 1. Got: %i\n",
+                    "%s live rounds. Rounds should be between 1 and the number of rounds minus 1. "
+                    "Got: %i\n",
                     live_rounds < 1 ? "Not enough" : "Too many",
                     live_rounds);
             }
@@ -112,7 +111,8 @@ void process_argv(int argc, string *argv) {
                 "5. noreport / nrep / report -> Switch wether the game report should be written to "
                 "a file named `output.roulette`.\n"
                 "6. r:<round_count> -> Set the number of rounds. Should be more than 3.\n"
-                "7. l:<live_rounds> -> Set the number of live rounds. Should be between 1 and the number of rounds minus 1.\n"
+                "7. l:<live_rounds> -> Set the number of live rounds. Should be between 1 and the "
+                "number of rounds minus 1.\n"
                 "8. help / ? / -h -> Show this menu and exit.\n\n"
 
                 "## Examples:\n"
