@@ -176,7 +176,7 @@ int main(int argc, string *argv) {
     
     print("Playing with %i blank round%sand %i live round%s", remainder_rounds, remainder_rounds == 1 ? " " : "s ", live_rounds, live_rounds == 1 ? "." : "s.");
     print("Bringing out the revolver...");
-    revolver = malloc(sizeof(bool) * round_count);
+    revolver = e_malloc(sizeof(bool) * round_count);
     msleep(1.5);
     
     printf("%sFilling the chamber... (", INDENT);

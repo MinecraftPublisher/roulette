@@ -22,7 +22,7 @@ string concatC(string left, string right) {
     int right_s = strlen(right);
     int size    = left_s + right_s;
 
-    string new = malloc(sizeof(char) * size);
+    string new = e_malloc(sizeof(char) * size);
     for (int i = 0; i < left_s; i++) new[ i ] = left[ i ];
     for (int i = left_s; i < size; i++) new[ i ] = right[ i ];
 
@@ -40,7 +40,7 @@ string concat(int count, ...) {
     }
     va_end(args);
 
-    string result = malloc(total_length + 1);
+    string result = e_malloc(total_length + 1);
     if (result == NULL) { return NULL; }
 
     va_start(args, count);
@@ -63,21 +63,21 @@ int revolver_pointer;
 void report(bool turn, enum ACTION action) {
     if (!report_initialized) {
         report_size = 255;
-        report_logs = malloc(sizeof(struct TURN) * report_size);
+        report_logs = e_malloc(sizeof(struct TURN) * report_size);
         report_initialized = true;
         report_pointer  = 0;
     }
 
     if (report_pointer == report_size - 1) {
         report_size += 255;
-        report_logs = realloc(report_logs, sizeof(struct TURN) * report_size);
+        report_logs = e_realloc(report_logs, sizeof(struct TURN) * report_size);
     }
 
-    struct TURN *_turn = malloc(sizeof(struct TURN));
+    struct TURN *_turn = e_malloc(sizeof(struct TURN));
     _turn->turn        = turn;
     _turn->action      = action;
     _turn->pointer     = revolver_pointer;
-    _turn->revolver    = malloc(sizeof(byte) * round_count);
+    _turn->revolver    = e_malloc(sizeof(byte) * round_count);
     for (int i = 0; i < round_count; i++) _turn->revolver[ i ] = revolver[ i ];
 
     report_logs[ report_pointer ] = *_turn;
@@ -95,9 +95,9 @@ string LINE(struct TURN t) {
                                            t.revolver[ t.pointer ] ? "live" : "blank",
                                            " round");
 
-    string revolver_out = malloc(sizeof(char) * round_count);
+    string revolver_out = e_malloc(sizeof(char) * round_count);
     for (int i = 0; i < round_count; i++) revolver_out[ i ] = t.revolver[ i ] ? '@' : 'O';
-    string revolver_point = malloc(sizeof(char) * round_count);
+    string revolver_point = e_malloc(sizeof(char) * round_count);
     for (int i = 0; i < round_count; i++) revolver_point[ i ] = i == t.pointer ? '^' : ' ';
     string revolver_graph = concat(4, revolver_out, "\n", revolver_point, "\n");
 
@@ -119,7 +119,7 @@ string LINE(struct TURN t) {
 
 string itoa(int i) {
     int    n = snprintf(NULL, 0, "%d", i) + 1;
-    string s = malloc(n);
+    string s = e_malloc(n);
 
     if (s != NULL) snprintf(s, n, "%d", i);
     return s;

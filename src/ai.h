@@ -1,6 +1,7 @@
 #ifndef __ROULETTE_HEADER_AI_H
 #define __ROULETTE_HEADER_AI_H
 
+#include "defines.h"
 #include "helpers.h"
 #include "report.h"
 #include "styles.h"
@@ -10,27 +11,30 @@
 void AI() {
     static enum NEXT_CHAMBER next_chamber = NO_IDEA;
 
-    static bool         aiinit = false;
-    static int          aisize = 255;
-    static enum ACTION *aichoice;
-    static int          aiptr;
+    static bool         ai_init = false;
+    static int          ai_size = 255;
+    static enum ACTION *ai_choice_history;
+    static int          ai_pointer;
+    static enum ACTION ai_choice = -1;
 
-    if (!aiinit) {
-        aichoice = malloc(sizeof(enum ACTION) * aisize);
-        aiinit   = true;
-        aiptr    = 0;
+    if (!ai_init) {
+        ai_choice_history = e_malloc(sizeof(enum ACTION) * ai_size);
+        ai_init   = true;
+        ai_pointer    = 0;
     }
 
-    if (aiptr == aisize - 1) {
-        aisize += 255;
-        aichoice = realloc(aichoice, sizeof(enum ACTION) * aisize);
+    if (ai_pointer == ai_size - 1) {
+        ai_size += 255;
+        ai_choice_history = e_realloc(ai_choice_history, sizeof(enum ACTION) * ai_size);
     }
 
     msleep(2);
 
+    if (ai_choice != CHECK_CHAMBER) next_chamber = NO_IDEA;
+
     // TODO: Implement better AI choice algorithm
     int         CAN_CHEAT = rand() % 100 < 5;
-    enum ACTION ai_choice = revolver[ revolver_pointer ] ? SHOOT_U : SHOOT_A;
+    ai_choice = revolver[ revolver_pointer ] ? SHOOT_U : SHOOT_A;
 
     // If cheating isn't allowed and the AI doesn't know what the next chamber is
     if (!CAN_CHEAT && next_chamber == NO_IDEA) {
@@ -54,8 +58,8 @@ void AI() {
         }
     }
 
-    aichoice[ aiptr ] = ai_choice;
-    aiptr++;
+    ai_choice_history[ ai_pointer ] = ai_choice;
+    ai_pointer++;
 
     switch (ai_choice) {
         case SHOOT_A:
@@ -134,7 +138,6 @@ void AI() {
             break;
     }
 
-    if (ai_choice != CHECK_CHAMBER) next_chamber = NO_IDEA;
     msleep(2.5);
 }
 
