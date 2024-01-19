@@ -21,7 +21,7 @@ void END() {
             print();
             fprintf(stderr, "%s\n", report);
         }
-        
+
         if (!no_report) {
             print();
             remove("output.roulette");
